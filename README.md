@@ -1,6 +1,6 @@
 # Love Lua
 
-A game made with LÖVE.
+A game made with LÖVE2D.
 
 ## Run
 
