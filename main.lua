@@ -6,6 +6,12 @@ function love.load()
     t = 0
 end
 
+function love.keypressed( k )
+    if k == "escape" then
+        love.event.push("quit")
+    end
+end
+
 function love.update(dt)
     if (t <= 0) then
         w = math.random(50, 200)
