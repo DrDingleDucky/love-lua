@@ -1,35 +1,38 @@
-local rect_x = love.graphics.getWidth() / 2
-local rect_y = love.graphics.getHeight() / 2
-local rect_width = 48
-local rect_height = 96
-local back_color = {1, 0.5, 0.5}
-local rect_color = {0.5, 0.5, 1}
-local dx = 0
-
+-- this function is called exactly once at the beginning of the game
 function love.load()
-    love.window.setTitle("Switch Runner")
+    love.window.setTitle("Lua Game")
     love.window.setMode(1200, 860)
-end
 
--- callback function triggered when a key is pressed
-function love.keypressed(key, scancode, isrepeat)
-    if key == "escape" then
-        love.event.quit()
-    end
+    player = {}
+    player.x = 100
+    player.y = 100
+    player.speed = 250
+    player.gravity = 850
+    player.radius = 30
+    player.dx = -1
+    player.dy = 0
 end
 
 -- callback function triggered when a mouse button is pressed
 function love.mousepressed(x, y, button, istouch)
+    player.dy = -550
 end
 
 -- callback function used to update the state of the game every frame
 function love.update(dt)
-    rect_x = rect_x + dx * 100 * dt
+    if player.x < 0 + player.radius then
+        player.dx = 1
+    elseif player.x > love.graphics.getWidth() - player.radius then
+        player.dx = -1
+    end
+    player.x = player.x + player.speed * player.dx * dt
+    player.dy = player.dy + 850 * dt
+    player.y = player.y + player.dy * dt
 end
 
 -- callback function used to draw on the screen every frame
 function love.draw()
-    love.graphics.setBackgroundColor(back_color)
-    love.graphics.setColor(rect_color)
-    love.graphics.rectangle("fill", rect_x, rect_y, rect_width, rect_height)
+    love.graphics.setBackgroundColor(1, 0.5, 0.5)
+    love.graphics.setColor(0.5, 0.5, 1)
+    love.graphics.circle("fill", player.x, player.y, player.radius)
 end
