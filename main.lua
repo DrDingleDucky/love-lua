@@ -9,8 +9,15 @@ function love.load()
     player.speed = 250
     player.gravity = 850
     player.radius = 30
-    player.dx = -1
+    player.dx = 1
     player.dy = 0
+end
+
+-- callback function triggered when a key is pressed
+function love.keypressed(key, scancode, isrepeat)
+    if key == "escape" then
+        love.event.quit()
+    end
 end
 
 -- callback function triggered when a mouse button is pressed
