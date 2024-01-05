@@ -5,6 +5,9 @@ function love.load()
 
     math.randomseed(os.time())
 
+    font = love.graphics.newFont("fonts/Roboto-Bold.ttf", 512)
+    love.graphics.setFont(font)
+
     player = {}
     player.x = love.graphics.getWidth() / 2
     player.y = love.graphics.getHeight() / 2
@@ -14,14 +17,16 @@ function love.load()
     player.dy = -player.velocity  / 2
     player.gravity = 850
     player.angle = 0
+    player.count = 3
 
     enemy = {}
     enemy.x = love.graphics.getWidth() / 2 - love.graphics.getWidth() / 4
     enemy.y = love.graphics.getHeight() / 2
     enemy.radius = 32
     enemy.velocity  = 250
-    enemy.dx = -1
-    enemy.dy = -1
+    enemy.d = {-1, 1}
+    enemy.dx = enemy.d[math.random(1, #enemy.d)]
+    enemy.dy = enemy.d[math.random(1, #enemy.d)]
 
     bullet = {}
     bullet.x = math.random(300, love.graphics.getWidth() - 300)
@@ -38,10 +43,11 @@ end
 
 -- callback function triggered when a mouse button is pressed
 function love.mousepressed(x, y, button, istouch)
-    if button == 1 then
+    if button == 1 and player.count > 0 then
         local angle = math.atan2(y - player.y, x - player.x)
         player.dx = math.cos(angle) * -player.velocity 
-        player.dy = math.sin(angle) * -player.velocity 
+        player.dy = math.sin(angle) * -player.velocity
+        player.count = player.count - 1
     end
 end
 
@@ -54,7 +60,18 @@ function love.update(dt)
         player.dx = math.abs(player.dx)
     elseif player.x > love.graphics.getWidth() - player.radius then
         player.dx = -math.abs(player.dx)
-    end
+    elseif player.y > love.graphics.getHeight() + player.radius then
+        player.x = love.graphics.getWidth() / 2
+        player.y = love.graphics.getHeight() / 2
+        player.dx = 0
+        player.dy = -player.velocity  / 2
+        player.count = 3
+
+        enemy.x = love.graphics.getWidth() / 2 - love.graphics.getWidth() / 4
+        enemy.y = love.graphics.getHeight() / 2    
+        enemy.dx = enemy.d[math.random(1, #enemy.d)]
+        enemy.dy = enemy.d[math.random(1, #enemy.d)]
+        end
 
     player.x = player.x + player.dx * dt
     player.dy = player.dy + player.gravity * dt
@@ -78,6 +95,7 @@ function love.update(dt)
         player.y = love.graphics.getHeight() / 2
         player.dx = 0
         player.dy = -player.velocity  / 2
+        player.count = 3
 
         enemy.x = love.graphics.getWidth() / 2 - love.graphics.getWidth() / 4
         enemy.y = love.graphics.getHeight() / 2    
@@ -86,6 +104,7 @@ function love.update(dt)
     elseif math.sqrt((player.x - bullet.x) ^ 2 + (player.y - bullet.y) ^ 2) < player.radius + bullet.radius then
         bullet.x = math.random(300, love.graphics.getWidth() - 300)
         bullet.y = math.random(300, love.graphics.getHeight() - 300)
+        player.count = player.count + 1
     end
 end
 
@@ -93,6 +112,10 @@ end
 function love.draw()
     -- backgound
     love.graphics.setBackgroundColor(0.5, 0.5, 1)
+
+    -- font
+    love.graphics.setColor(1, 1, 1, 0.2)
+    love.graphics.print(player.count, love.graphics.getWidth() / 2 - 120, love.graphics.getHeight() / 2 - 250)
 
     -- player
     love.graphics.setColor(0.5, 1, 0.5)
