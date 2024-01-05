@@ -6,6 +6,8 @@ function love.load()
     player = {}
     player.x = love.graphics.getWidth() / 2
     player.y = love.graphics.getHeight() / 2
+    player.bx = 0
+    player.by = 0
     player.force = 715
     player.gravity = 850
     player.radius = 32
@@ -32,7 +34,7 @@ end
 
 -- callback function used to update the state of the game every frame
 function love.update(dt)
-    local x, y = love.mouse.getPosition( )
+    local x, y = love.mouse.getPosition()
     player.angle = math.atan2(y - player.y, x - player.x)
     if player.x < 0 + player.radius then
         player.dx = math.abs(player.dx)
@@ -49,12 +51,15 @@ function love.draw()
     love.graphics.setBackgroundColor(1, 0.5, 0.5)
     love.graphics.setColor(0.5, 0.5, 1)
     love.graphics.circle("fill", player.x, player.y, player.radius)
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.circle("fill", player.x, player.y, player.radius - player.radius / 2)
     
     love.graphics.translate(player.x, player.y)
     love.graphics.rotate(player.angle)
     love.graphics.translate(-player.x, -player.y)
     love.graphics.setColor(1, 1, 1)
-    love.graphics.rectangle("fill", player.x, player.y - 7, 64, 14)
+    love.graphics.rectangle("fill", player.x, player.y - 7, 48, 14)
+
     love.graphics.setColor(1, 1, 1)
-    love.graphics.circle("fill", player.x, player.y, player.radius - player.radius / 2)
+    love.graphics.circle("fill", player.x + 48, player.y, 7)
 end
