@@ -4,8 +4,8 @@ function love.load()
     love.window.setMode(1200, 860)
 
     player = {}
-    player.x = 100
-    player.y = 100
+    player.x = love.graphics.getWidth() / 2
+    player.y = love.graphics.getHeight() / 2
     player.speed = 250
     player.gravity = 850
     player.radius = 30
@@ -33,7 +33,7 @@ function love.update(dt)
         player.dx = -1
     end
     player.x = player.x + player.speed * player.dx * dt
-    player.dy = player.dy + 850 * dt
+    player.dy = player.dy + 0 * dt
     player.y = player.y + player.dy * dt
 end
 
