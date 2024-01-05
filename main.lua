@@ -6,10 +6,10 @@ function love.load()
     player = {}
     player.x = love.graphics.getWidth() / 2
     player.y = love.graphics.getHeight() / 2
-    player.speed = 250
+    player.force = 850
     player.gravity = 850
     player.radius = 30
-    player.dx = 1
+    player.dx = 0
     player.dy = 0
 end
 
@@ -22,18 +22,22 @@ end
 
 -- callback function triggered when a mouse button is pressed
 function love.mousepressed(x, y, button, istouch)
-    player.dy = -550
+    if button == 1 then
+        local angle = math.atan2(y - player.y, x - player.x)
+        player.dx = math.cos(angle) * -player.force
+        player.dy = math.sin(angle) * -player.force
+    end
 end
 
 -- callback function used to update the state of the game every frame
 function love.update(dt)
     if player.x < 0 + player.radius then
-        player.dx = 1
+        player.dx = math.abs(player.dx)
     elseif player.x > love.graphics.getWidth() - player.radius then
-        player.dx = -1
+        player.dx = -math.abs(player.dx)
     end
-    player.x = player.x + player.speed * player.dx * dt
-    player.dy = player.dy + 0 * dt
+    player.x = player.x + player.dx * dt
+    player.dy = player.dy + player.gravity * dt
     player.y = player.y + player.dy * dt
 end
 
