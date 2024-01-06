@@ -5,19 +5,20 @@ function love.load()
 
     math.randomseed(os.time())
 
-    font = love.graphics.newFont("fonts/Roboto-Bold.ttf", 512)
-    love.graphics.setFont(font)
+    font1 = love.graphics.newFont("fonts/Roboto-Bold.ttf", 512)
+    font2 = love.graphics.newFont("fonts/Roboto-Bold.ttf", 128)
 
     player = {}
     player.x = love.graphics.getWidth() / 2
     player.y = love.graphics.getHeight() / 2
     player.radius = 32
     player.velocity = 715
+    player.gravity = 850
     player.dx = 0
     player.dy = -player.velocity  / 2
-    player.gravity = 850
-    player.angle = 0
     player.count = 3
+    player.score = 0
+    player.angle = 0
 
     enemy = {}
     enemy.x = love.graphics.getWidth() / 2 - love.graphics.getWidth() / 4
@@ -25,8 +26,8 @@ function love.load()
     enemy.radius = 32
     enemy.velocity  = 250
     enemy.d = {-1, 1}
-    enemy.dx = enemy.d[math.random(1, #enemy.d)]
-    enemy.dy = enemy.d[math.random(1, #enemy.d)]
+    enemy.dx = enemy.d[math.random(1, 2)]
+    enemy.dy = enemy.d[math.random(1, 2)]
 
     bullet = {}
     bullet.x = math.random(300, love.graphics.getWidth() - 300)
@@ -66,12 +67,13 @@ function love.update(dt)
         player.dx = 0
         player.dy = -player.velocity  / 2
         player.count = 3
+        player.score = 0
 
         enemy.x = love.graphics.getWidth() / 2 - love.graphics.getWidth() / 4
         enemy.y = love.graphics.getHeight() / 2    
         enemy.dx = enemy.d[math.random(1, #enemy.d)]
         enemy.dy = enemy.d[math.random(1, #enemy.d)]
-        end
+    end
 
     player.x = player.x + player.dx * dt
     player.dy = player.dy + player.gravity * dt
@@ -96,6 +98,7 @@ function love.update(dt)
         player.dx = 0
         player.dy = -player.velocity  / 2
         player.count = 3
+        player.score = 0
 
         enemy.x = love.graphics.getWidth() / 2 - love.graphics.getWidth() / 4
         enemy.y = love.graphics.getHeight() / 2    
@@ -105,6 +108,7 @@ function love.update(dt)
         bullet.x = math.random(300, love.graphics.getWidth() - 300)
         bullet.y = math.random(300, love.graphics.getHeight() - 300)
         player.count = player.count + 1
+        player.score = player.score + 1
     end
 end
 
@@ -113,9 +117,12 @@ function love.draw()
     -- backgound
     love.graphics.setBackgroundColor(0.5, 0.5, 1)
 
-    -- font
+    -- fonts
     love.graphics.setColor(1, 1, 1, 0.2)
-    love.graphics.print(player.count, love.graphics.getWidth() / 2 - 120, love.graphics.getHeight() / 2 - 250)
+    love.graphics.setFont(font1)
+    love.graphics.print(player.count, love.graphics.getWidth() / 2 - font1:getWidth(player.count) / 2, love.graphics.getHeight() / 2 - font1:getHeight() / 2)
+    love.graphics.setFont(font2)
+    love.graphics.print(player.score, love.graphics.getWidth() / 2 - font2:getWidth(player.score) / 2, 0)
 
     -- player
     love.graphics.setColor(0.5, 1, 0.5)
