@@ -50,6 +50,7 @@ function love.load()
 
     enemy1 = Enemy:new(love.graphics.getWidth() / 2 - love.graphics.getWidth() / 4, love.graphics.getHeight() / 2, 32, 250, dir[math.random(1, 2)], dir[math.random(1, 2)])
     enemy2 = Enemy:new(love.graphics.getWidth() / 2 + love.graphics.getWidth() / 4, love.graphics.getHeight() / 2, 32, 250, dir[math.random(1, 2)], dir[math.random(1, 2)])
+    enemies = {enemy1, enemy2}
 
     bullet1 = Bullet:new(math.random(300, love.graphics.getWidth() - 300), math.random(300, love.graphics.getHeight() - 300), 16)
     bullet2 = Bullet:new(math.random(300, love.graphics.getWidth() - 300), math.random(300, love.graphics.getHeight() - 300), 16)
@@ -86,46 +87,33 @@ function love.update(dt)
         player.count = 3
         player.score = 0
 
+        for key, value in pairs(enemies) do
+            value.pos_y = love.graphics.getHeight() / 2
+            value.dir_x = dir[math.random(1, #dir)]
+            value.dir_y = dir[math.random(1, #dir)]
+        end
         enemy1.pos_x = love.graphics.getWidth() / 2 - love.graphics.getWidth() / 4
-        enemy1.pos_y = love.graphics.getHeight() / 2    
-        enemy1.dir_x = dir[math.random(1, #dir)]
-        enemy1.dir_y = dir[math.random(1, #dir)]
-
         enemy2.pos_x = love.graphics.getWidth() / 2 + love.graphics.getWidth() / 4
-        enemy2.pos_y = love.graphics.getHeight() / 2    
-        enemy2.dir_x = dir[math.random(1, #dir)]
-        enemy2.dir_y = dir[math.random(1, #dir)]
     end
 
     player.pos_x = player.pos_x + player.dir_x * dt
     player.dir_y = player.dir_y + player.gravity * dt
     player.pos_y = player.pos_y + player.dir_y * dt
 
-    if enemy1.pos_x < 0 + enemy1.radius then
-        enemy1.dir_x = math.abs(enemy1.dir_x)
-    elseif enemy1.pos_x > love.graphics.getWidth() - enemy1.radius then
-        enemy1.dir_x = -math.abs(enemy1.dir_x)
-    elseif enemy1.pos_y < 0 + enemy1.radius then
-        enemy1.dir_y = math.abs(enemy1.dir_y)
-    elseif enemy1.pos_y > love.graphics.getHeight() - enemy1.radius then
-        enemy1.dir_y = -math.abs(enemy1.dir_y)
+    for key, value in pairs(enemies) do
+        if value.pos_x < 0 + value.radius then
+            value.dir_x = math.abs(value.dir_x)
+        elseif value.pos_x > love.graphics.getWidth() - value.radius then
+            value.dir_x = -math.abs(value.dir_x)
+        elseif value.pos_y < 0 + value.radius then
+            value.dir_y = math.abs(value.dir_y)
+        elseif value.pos_y > love.graphics.getHeight() - value.radius then
+            value.dir_y = -math.abs(value.dir_y)
+        end
+        value.pos_x = value.pos_x + value.dir_x * value.velocity  * dt
+        value.pos_y = value.pos_y + value.dir_y * value.velocity  * dt
     end
 
-    if enemy2.pos_x < 0 + enemy2.radius then
-        enemy2.dir_x = math.abs(enemy2.dir_x)
-    elseif enemy2.pos_x > love.graphics.getWidth() - enemy2.radius then
-        enemy2.dir_x = -math.abs(enemy2.dir_x)
-    elseif enemy2.pos_y < 0 + enemy2.radius then
-        enemy2.dir_y = math.abs(enemy2.dir_y)
-    elseif enemy2.pos_y > love.graphics.getHeight() - enemy2.radius then
-        enemy2.dir_y = -math.abs(enemy2.dir_y)
-    end
-
-    enemy1.pos_x = enemy1.pos_x + enemy1.dir_x * enemy1.velocity  * dt
-    enemy1.pos_y = enemy1.pos_y + enemy1.dir_y * enemy1.velocity  * dt
-
-    enemy2.pos_x = enemy2.pos_x + enemy2.dir_x * enemy2.velocity  * dt
-    enemy2.pos_y = enemy2.pos_y + enemy2.dir_y * enemy2.velocity  * dt
 
     if math.sqrt((player.pos_x - enemy1.pos_x) ^ 2 + (player.pos_y - enemy1.pos_y) ^ 2) < player.radius + enemy1.radius then
         player.pos_x = love.graphics.getWidth() / 2
@@ -135,15 +123,13 @@ function love.update(dt)
         player.count = 3
         player.score = 0
 
+        for key, value in pairs(enemies) do
+            value.pos_y = love.graphics.getHeight() / 2
+            value.dir_x = dir[math.random(1, #dir)]
+            value.dir_y = dir[math.random(1, #dir)]
+        end
         enemy1.pos_x = love.graphics.getWidth() / 2 - love.graphics.getWidth() / 4
-        enemy1.pos_y = love.graphics.getHeight() / 2    
-        enemy1.dir_x = dir[math.random(1, #dir)]
-        enemy1.dir_y = dir[math.random(1, #dir)]
-
         enemy2.pos_x = love.graphics.getWidth() / 2 + love.graphics.getWidth() / 4
-        enemy2.pos_y = love.graphics.getHeight() / 2    
-        enemy2.dir_x = dir[math.random(1, #dir)]
-        enemy2.dir_y = dir[math.random(1, #dir)]
     elseif math.sqrt((player.pos_x - enemy2.pos_x) ^ 2 + (player.pos_y - enemy2.pos_y) ^ 2) < player.radius + enemy2.radius then
         player.pos_x = love.graphics.getWidth() / 2
         player.pos_y = love.graphics.getHeight() / 2
@@ -152,15 +138,13 @@ function love.update(dt)
         player.count = 3
         player.score = 0
 
+        for key, value in pairs(enemies) do
+            value.pos_y = love.graphics.getHeight() / 2
+            value.dir_x = dir[math.random(1, #dir)]
+            value.dir_y = dir[math.random(1, #dir)]
+        end
         enemy1.pos_x = love.graphics.getWidth() / 2 - love.graphics.getWidth() / 4
-        enemy1.pos_y = love.graphics.getHeight() / 2    
-        enemy1.dir_x = dir[math.random(1, #dir)]
-        enemy1.dir_y = dir[math.random(1, #dir)]
-
         enemy2.pos_x = love.graphics.getWidth() / 2 + love.graphics.getWidth() / 4
-        enemy2.pos_y = love.graphics.getHeight() / 2    
-        enemy2.dir_x = dir[math.random(1, #dir)]
-        enemy2.dir_y = dir[math.random(1, #dir)]
     elseif math.sqrt((player.pos_x - bullet1.pos_x) ^ 2 + (player.pos_y - bullet1.pos_y) ^ 2) < player.radius + bullet1.radius then
         bullet1.pos_x = math.random(300, love.graphics.getWidth() - 300)
         bullet1.pos_y = math.random(300, love.graphics.getHeight() - 300)
