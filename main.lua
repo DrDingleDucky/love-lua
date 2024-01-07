@@ -37,8 +37,6 @@ function Bullet:new(pos_x, pos_y, radius)
     return self
 end
 
-
--- this function is called exactly once at the beginning of the game
 function love.load()
     love.window.setTitle("Lua Game")
     love.window.setMode(1200, 860)
@@ -57,14 +55,12 @@ function love.load()
     bullet2 = Bullet:new(math.random(300, love.graphics.getWidth() - 300), math.random(300, love.graphics.getHeight() - 300), 16)
 end
 
--- callback function triggered when a key is pressed
 function love.keypressed(key, scancode, isrepeat)
     if key == "escape" then
         love.event.quit()
     end
 end
 
--- callback function triggered when a mouse button is pressed
 function love.mousepressed(x, y, button, istouch)
     if button == 1 and player.count > 0 then
         local angle = math.atan2(y - player.pos_y, x - player.pos_x)
@@ -74,7 +70,6 @@ function love.mousepressed(x, y, button, istouch)
     end
 end
 
--- callback function used to update the state of the game every frame
 function love.update(dt)
     local x, y = love.mouse.getPosition()
     player.angle = math.atan2(y - player.pos_y, x - player.pos_x)
@@ -142,13 +137,13 @@ function love.update(dt)
 
         enemy1.pos_x = love.graphics.getWidth() / 2 - love.graphics.getWidth() / 4
         enemy1.pos_y = love.graphics.getHeight() / 2    
-        enemy1.dir_x = -1
-        enemy1.dir_y = -1
+        enemy1.dir_x = dir[math.random(1, #dir)]
+        enemy1.dir_y = dir[math.random(1, #dir)]
 
         enemy2.pos_x = love.graphics.getWidth() / 2 + love.graphics.getWidth() / 4
         enemy2.pos_y = love.graphics.getHeight() / 2    
-        enemy2.dir_x = -1
-        enemy2.dir_y = -1
+        enemy2.dir_x = dir[math.random(1, #dir)]
+        enemy2.dir_y = dir[math.random(1, #dir)]
     elseif math.sqrt((player.pos_x - enemy2.pos_x) ^ 2 + (player.pos_y - enemy2.pos_y) ^ 2) < player.radius + enemy2.radius then
         player.pos_x = love.graphics.getWidth() / 2
         player.pos_y = love.graphics.getHeight() / 2
@@ -159,13 +154,13 @@ function love.update(dt)
 
         enemy1.pos_x = love.graphics.getWidth() / 2 - love.graphics.getWidth() / 4
         enemy1.pos_y = love.graphics.getHeight() / 2    
-        enemy1.dir_x = -1
-        enemy1.dir_y = -1
+        enemy1.dir_x = dir[math.random(1, #dir)]
+        enemy1.dir_y = dir[math.random(1, #dir)]
 
         enemy2.pos_x = love.graphics.getWidth() / 2 + love.graphics.getWidth() / 4
         enemy2.pos_y = love.graphics.getHeight() / 2    
-        enemy2.dir_x = -1
-        enemy2.dir_y = -1
+        enemy2.dir_x = dir[math.random(1, #dir)]
+        enemy2.dir_y = dir[math.random(1, #dir)]
     elseif math.sqrt((player.pos_x - bullet1.pos_x) ^ 2 + (player.pos_y - bullet1.pos_y) ^ 2) < player.radius + bullet1.radius then
         bullet1.pos_x = math.random(300, love.graphics.getWidth() - 300)
         bullet1.pos_y = math.random(300, love.graphics.getHeight() - 300)
@@ -179,7 +174,6 @@ function love.update(dt)
     end
 end
 
--- callback function used to draw on the screen every frame
 function love.draw()
     -- backgound
     love.graphics.setBackgroundColor(0.5, 0.5, 1)
