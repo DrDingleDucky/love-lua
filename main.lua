@@ -20,19 +20,33 @@ function love.load()
     player.score = 0
     player.angle = 0
 
-    enemy = {}
-    enemy.x = love.graphics.getWidth() / 2 - love.graphics.getWidth() / 4
-    enemy.y = love.graphics.getHeight() / 2
-    enemy.radius = 32
-    enemy.velocity  = 250
-    enemy.d = {-1, 1}
-    enemy.dx = enemy.d[math.random(1, 2)]
-    enemy.dy = enemy.d[math.random(1, 2)]
+    enemy1 = {}
+    enemy1.x = love.graphics.getWidth() / 2 - love.graphics.getWidth() / 4
+    enemy1.y = love.graphics.getHeight() / 2
+    enemy1.radius = 32
+    enemy1.velocity  = 250
+    enemy1.d = {-1, 1}
+    enemy1.dx = enemy1.d[math.random(1, 2)]
+    enemy1.dy = enemy1.d[math.random(1, 2)]
 
-    bullet = {}
-    bullet.x = math.random(300, love.graphics.getWidth() - 300)
-    bullet.y = math.random(300, love.graphics.getHeight() - 300)
-    bullet.radius = 16
+    enemy2 = {}
+    enemy2.x = love.graphics.getWidth() / 2 + love.graphics.getWidth() / 4
+    enemy2.y = love.graphics.getHeight() / 2
+    enemy2.radius = 32
+    enemy2.velocity  = 250
+    enemy2.d = {-1, 1}
+    enemy2.dx = enemy2.d[math.random(1, 2)]
+    enemy2.dy = enemy2.d[math.random(1, 2)]
+
+    bullet1 = {}
+    bullet1.x = math.random(300, love.graphics.getWidth() - 300)
+    bullet1.y = math.random(300, love.graphics.getHeight() - 300)
+    bullet1.radius = 16
+
+    bullet2 = {}
+    bullet2.x = math.random(300, love.graphics.getWidth() - 300)
+    bullet2.y = math.random(300, love.graphics.getHeight() - 300)
+    bullet2.radius = 16
 end
 
 -- callback function triggered when a key is pressed
@@ -69,30 +83,48 @@ function love.update(dt)
         player.count = 3
         player.score = 0
 
-        enemy.x = love.graphics.getWidth() / 2 - love.graphics.getWidth() / 4
-        enemy.y = love.graphics.getHeight() / 2    
-        enemy.dx = enemy.d[math.random(1, #enemy.d)]
-        enemy.dy = enemy.d[math.random(1, #enemy.d)]
+        enemy1.x = love.graphics.getWidth() / 2 - love.graphics.getWidth() / 4
+        enemy1.y = love.graphics.getHeight() / 2    
+        enemy1.dx = enemy1.d[math.random(1, #enemy1.d)]
+        enemy1.dy = enemy1.d[math.random(1, #enemy1.d)]
+
+        enemy2.x = love.graphics.getWidth() / 2 + love.graphics.getWidth() / 4
+        enemy2.y = love.graphics.getHeight() / 2    
+        enemy2.dx = enemy2.d[math.random(1, #enemy2.d)]
+        enemy2.dy = enemy2.d[math.random(1, #enemy2.d)]
     end
 
     player.x = player.x + player.dx * dt
     player.dy = player.dy + player.gravity * dt
     player.y = player.y + player.dy * dt
 
-    if enemy.x < 0 + enemy.radius then
-        enemy.dx = math.abs(enemy.dx)
-    elseif enemy.x > love.graphics.getWidth() - enemy.radius then
-        enemy.dx = -math.abs(enemy.dx)
-    elseif enemy.y < 0 + enemy.radius then
-        enemy.dy = math.abs(enemy.dy)
-    elseif enemy.y > love.graphics.getHeight() - enemy.radius then
-        enemy.dy = -math.abs(enemy.dy)
+    if enemy1.x < 0 + enemy1.radius then
+        enemy1.dx = math.abs(enemy1.dx)
+    elseif enemy1.x > love.graphics.getWidth() - enemy1.radius then
+        enemy1.dx = -math.abs(enemy1.dx)
+    elseif enemy1.y < 0 + enemy1.radius then
+        enemy1.dy = math.abs(enemy1.dy)
+    elseif enemy1.y > love.graphics.getHeight() - enemy1.radius then
+        enemy1.dy = -math.abs(enemy1.dy)
     end
 
-    enemy.x = enemy.x + enemy.dx * enemy.velocity  * dt
-    enemy.y = enemy.y + enemy.dy * enemy.velocity  * dt
+    if enemy2.x < 0 + enemy2.radius then
+        enemy2.dx = math.abs(enemy2.dx)
+    elseif enemy2.x > love.graphics.getWidth() - enemy2.radius then
+        enemy2.dx = -math.abs(enemy2.dx)
+    elseif enemy2.y < 0 + enemy2.radius then
+        enemy2.dy = math.abs(enemy2.dy)
+    elseif enemy2.y > love.graphics.getHeight() - enemy2.radius then
+        enemy2.dy = -math.abs(enemy2.dy)
+    end
 
-    if math.sqrt((player.x - enemy.x) ^ 2 + (player.y - enemy.y) ^ 2) < player.radius + enemy.radius then
+    enemy1.x = enemy1.x + enemy1.dx * enemy1.velocity  * dt
+    enemy1.y = enemy1.y + enemy1.dy * enemy1.velocity  * dt
+
+    enemy2.x = enemy2.x + enemy2.dx * enemy2.velocity  * dt
+    enemy2.y = enemy2.y + enemy2.dy * enemy2.velocity  * dt
+
+    if math.sqrt((player.x - enemy1.x) ^ 2 + (player.y - enemy1.y) ^ 2) < player.radius + enemy1.radius then
         player.x = love.graphics.getWidth() / 2
         player.y = love.graphics.getHeight() / 2
         player.dx = 0
@@ -100,13 +132,40 @@ function love.update(dt)
         player.count = 3
         player.score = 0
 
-        enemy.x = love.graphics.getWidth() / 2 - love.graphics.getWidth() / 4
-        enemy.y = love.graphics.getHeight() / 2    
-        enemy.dx = -1
-        enemy.dy = -1
-    elseif math.sqrt((player.x - bullet.x) ^ 2 + (player.y - bullet.y) ^ 2) < player.radius + bullet.radius then
-        bullet.x = math.random(300, love.graphics.getWidth() - 300)
-        bullet.y = math.random(300, love.graphics.getHeight() - 300)
+        enemy1.x = love.graphics.getWidth() / 2 - love.graphics.getWidth() / 4
+        enemy1.y = love.graphics.getHeight() / 2    
+        enemy1.dx = -1
+        enemy1.dy = -1
+
+        enemy2.x = love.graphics.getWidth() / 2 + love.graphics.getWidth() / 4
+        enemy2.y = love.graphics.getHeight() / 2    
+        enemy2.dx = -1
+        enemy2.dy = -1
+    elseif math.sqrt((player.x - enemy2.x) ^ 2 + (player.y - enemy2.y) ^ 2) < player.radius + enemy2.radius then
+        player.x = love.graphics.getWidth() / 2
+        player.y = love.graphics.getHeight() / 2
+        player.dx = 0
+        player.dy = -player.velocity  / 2
+        player.count = 3
+        player.score = 0
+
+        enemy1.x = love.graphics.getWidth() / 2 - love.graphics.getWidth() / 4
+        enemy1.y = love.graphics.getHeight() / 2    
+        enemy1.dx = -1
+        enemy1.dy = -1
+
+        enemy2.x = love.graphics.getWidth() / 2 + love.graphics.getWidth() / 4
+        enemy2.y = love.graphics.getHeight() / 2    
+        enemy2.dx = -1
+        enemy2.dy = -1
+    elseif math.sqrt((player.x - bullet1.x) ^ 2 + (player.y - bullet1.y) ^ 2) < player.radius + bullet1.radius then
+        bullet1.x = math.random(300, love.graphics.getWidth() - 300)
+        bullet1.y = math.random(300, love.graphics.getHeight() - 300)
+        player.count = player.count + 1
+        player.score = player.score + 1
+    elseif math.sqrt((player.x - bullet2.x) ^ 2 + (player.y - bullet2.y) ^ 2) < player.radius + bullet2.radius then
+        bullet2.x = math.random(300, love.graphics.getWidth() - 300)
+        bullet2.y = math.random(300, love.graphics.getHeight() - 300)
         player.count = player.count + 1
         player.score = player.score + 1
     end
@@ -132,13 +191,20 @@ function love.draw()
     love.graphics.setColor(1, 1, 1)
     love.graphics.circle("fill", player.x, player.y, player.radius - player.radius / 2)
 
-    -- enemy
+    -- enemy1
     love.graphics.setColor(1, 0.5, 0.5)
-    love.graphics.circle("fill", enemy.x, enemy.y, enemy.radius)
+    love.graphics.circle("fill", enemy1.x, enemy1.y, enemy1.radius)
+    -- enemy2
+    love.graphics.setColor(1, 0.5, 0.5)
+    love.graphics.circle("fill", enemy2.x, enemy2.y, enemy2.radius)
 
-    -- bullet
+    -- bullet1
     love.graphics.setColor(1, 1, 0.5)
-    love.graphics.circle("fill", bullet.x, bullet.y, bullet.radius)
+    love.graphics.circle("fill", bullet1.x, bullet1.y, bullet1.radius)
+
+    -- bullet2
+    love.graphics.setColor(1, 1, 0.5)
+    love.graphics.circle("fill", bullet2.x, bullet2.y, bullet2.radius)
 
     -- player barrel
     love.graphics.translate(player.x, player.y)
