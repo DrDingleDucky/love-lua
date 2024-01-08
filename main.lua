@@ -54,6 +54,7 @@ function love.load()
 
     bullet1 = Bullet:new(math.random(300, love.graphics.getWidth() - 300), math.random(300, love.graphics.getHeight() - 300), 16)
     bullet2 = Bullet:new(math.random(300, love.graphics.getWidth() - 300), math.random(300, love.graphics.getHeight() - 300), 16)
+    bullets = {bullet1, bullet2}
 end
 
 function love.keypressed(key, scancode, isrepeat)
@@ -94,6 +95,11 @@ function love.update(dt)
         end
         enemy1.pos_x = love.graphics.getWidth() / 2 - love.graphics.getWidth() / 4
         enemy2.pos_x = love.graphics.getWidth() / 2 + love.graphics.getWidth() / 4
+
+        for key, value in pairs(bullets) do
+            value.pos_x = math.random(300, love.graphics.getWidth() - 300)
+            value.pos_y = math.random(300, love.graphics.getHeight() - 300)    
+        end
     end
 
     player.pos_x = player.pos_x + player.dir_x * dt
@@ -114,7 +120,6 @@ function love.update(dt)
         value.pos_y = value.pos_y + value.dir_y * value.velocity  * dt
     end
 
-
     if math.sqrt((player.pos_x - enemy1.pos_x) ^ 2 + (player.pos_y - enemy1.pos_y) ^ 2) < player.radius + enemy1.radius then
         player.pos_x = love.graphics.getWidth() / 2
         player.pos_y = love.graphics.getHeight() / 2
@@ -130,6 +135,11 @@ function love.update(dt)
         end
         enemy1.pos_x = love.graphics.getWidth() / 2 - love.graphics.getWidth() / 4
         enemy2.pos_x = love.graphics.getWidth() / 2 + love.graphics.getWidth() / 4
+
+        for key, value in pairs(bullets) do
+            value.pos_x = math.random(300, love.graphics.getWidth() - 300)
+            value.pos_y = math.random(300, love.graphics.getHeight() - 300)    
+        end
     elseif math.sqrt((player.pos_x - enemy2.pos_x) ^ 2 + (player.pos_y - enemy2.pos_y) ^ 2) < player.radius + enemy2.radius then
         player.pos_x = love.graphics.getWidth() / 2
         player.pos_y = love.graphics.getHeight() / 2
@@ -145,6 +155,11 @@ function love.update(dt)
         end
         enemy1.pos_x = love.graphics.getWidth() / 2 - love.graphics.getWidth() / 4
         enemy2.pos_x = love.graphics.getWidth() / 2 + love.graphics.getWidth() / 4
+
+        for key, value in pairs(bullets) do
+            value.pos_x = math.random(300, love.graphics.getWidth() - 300)
+            value.pos_y = math.random(300, love.graphics.getHeight() - 300)    
+        end
     elseif math.sqrt((player.pos_x - bullet1.pos_x) ^ 2 + (player.pos_y - bullet1.pos_y) ^ 2) < player.radius + bullet1.radius then
         bullet1.pos_x = math.random(300, love.graphics.getWidth() - 300)
         bullet1.pos_y = math.random(300, love.graphics.getHeight() - 300)
