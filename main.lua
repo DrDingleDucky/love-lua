@@ -1,4 +1,5 @@
 local dir = {-1, 1}
+local paused = false
 
 Player = {pos_x = 0, pos_y = 0, radius = 64, velocity = 500, gravity = 600, dir_x = 0, dir_y = 0, count = 0, score = 0, angle = 0}
 function Player:new(pos_x, pos_y, radius, velocity, gravity, dir_x, dir_y, count, score, angle)
@@ -101,11 +102,14 @@ end
 
 function love.keypressed(key, scancode, isrepeat)
     if key == "escape" then
-        love.event.quit()
+        -- love.event.quit()
+        paused = not paused
     end
 end
 
 function love.mousepressed(x, y, button, istouch)
+    if paused then return end
+
     if button == 1 and player.count > 0 then
         local angle = math.atan2(y - player.pos_y, x - player.pos_x)
         player.dir_x = math.cos(angle) * -player.velocity 
@@ -116,6 +120,8 @@ function love.mousepressed(x, y, button, istouch)
 end
 
 function love.update(dt)
+    if paused then dt = 0 end
+
     local x, y = love.mouse.getPosition()
     player.angle = math.atan2(y - player.pos_y, x - player.pos_x)
 
