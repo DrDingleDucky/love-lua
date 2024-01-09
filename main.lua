@@ -132,11 +132,11 @@ function love.update(dt)
     player.pos_y = player.pos_y + player.dir_y * dt
 
     for key, value in pairs(enemies) do
-        if value.pos_x < 0 + value.radius then
+        if value.pos_x < value.radius then
             value.dir_x = math.abs(value.dir_x)
         elseif value.pos_x > love.graphics.getWidth() - value.radius then
             value.dir_x = -math.abs(value.dir_x)
-        elseif value.pos_y < 0 + value.radius then
+        elseif value.pos_y < value.radius then
             value.dir_y = math.abs(value.dir_y)
         elseif value.pos_y > love.graphics.getHeight() - value.radius then
             value.dir_y = -math.abs(value.dir_y)
@@ -158,14 +158,14 @@ function love.update(dt)
         end
     end
 
-    for key, value in pairs(bullets) do
-        for key1, value1 in pairs(enemies) do
-            if math.sqrt((value1.pos_x - value.pos_x) ^ 2 + (value1.pos_y - value.pos_y) ^ 2) < value1.radius + value.radius then
-                table.remove(enemies, key1)
+    for key1, value1 in pairs(bullets) do
+        for key2, value2 in pairs(enemies) do
+            if math.sqrt((value2.pos_x - value1.pos_x) ^ 2 + (value2.pos_y - value1.pos_y) ^ 2) < value2.radius + value1.radius then
+                value2.pos_y = -value2.radius - 1300
             end
         end
-        value.pos_x = value.pos_x + value.dir_x * value.velocity * dt
-        value.pos_y = value.pos_y + value.dir_y * value.velocity * dt
+        value1.pos_x = value1.pos_x + value1.dir_x * value1.velocity * dt
+        value1.pos_y = value1.pos_y + value1.dir_y * value1.velocity * dt
     end
 end
 
