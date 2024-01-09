@@ -58,17 +58,17 @@ function love.load()
     font1 = love.graphics.newFont("fonts/Roboto-Bold.ttf", 512)
     font2 = love.graphics.newFont("fonts/Roboto-Bold.ttf", 128)
 
-    player = Player:new(love.graphics.getWidth() / 2, love.graphics.getHeight() / 2, 32, 715, 850, 0, -750 / 2, 3, 0, 0)
+    player = Player:new(love.graphics.getWidth() / 2, love.graphics.getHeight() / 2, 32, 715, 850, 0, -750 / 2, 30, 0, 0)
 
-    enemy1 = Enemy:new(love.graphics.getWidth() / 2 - love.graphics.getWidth() / 4, love.graphics.getHeight() / 2, 32, 250, dir[math.random(1, 2)], dir[math.random(1, 2)])
-    enemy2 = Enemy:new(love.graphics.getWidth() / 2 + love.graphics.getWidth() / 4, love.graphics.getHeight() / 2, 32, 250, dir[math.random(1, 2)], dir[math.random(1, 2)])
+    enemy1 = Enemy:new(love.graphics.getWidth() / 2 - love.graphics.getWidth() / 4, love.graphics.getHeight() / 2, 32, 50, dir[math.random(1, 2)], dir[math.random(1, 2)])
+    enemy2 = Enemy:new(love.graphics.getWidth() / 2 + love.graphics.getWidth() / 4, love.graphics.getHeight() / 2, 32, 50, dir[math.random(1, 2)], dir[math.random(1, 2)])
     enemies = {enemy1, enemy2}
 
     refill1 = Refill:new(math.random(300, love.graphics.getWidth() - 300), math.random(300, love.graphics.getHeight() - 300), 16)
     refill2 = Refill:new(math.random(300, love.graphics.getWidth() - 300), math.random(300, love.graphics.getHeight() - 300), 16)
     refills = {refill1, refill2}
 
-    bullet_table = {}
+    bullets = {}
 end
 
 function love.keypressed(key, scancode, isrepeat)
@@ -83,9 +83,9 @@ function love.mousepressed(x, y, button, istouch)
         player.dir_x = math.cos(angle) * -player.velocity 
         player.dir_y = math.sin(angle) * -player.velocity
         player.count = player.count - 1
-        local dir_x = math.sqrt(player.pos_x ^ 2 + x ^ 2) * -1
+        local dir_x = math.sqrt(player.dir_x ^ 2 + x ^ 2) * -1
         local dir_y = math.sqrt(player.dir_y ^ 2 + y ^ 2) * -1
-        table.insert(bullet_table, Bullet:new(player.pos_x, player.pos_y, 14, 800, player.dir_x / dir_x, player.dir_y / dir_y))
+        table.insert(bullets, Bullet:new(player.pos_x, player.pos_y, 14, 800, player.dir_x / dir_x, player.dir_y / dir_y))
     end
 end
 
@@ -189,10 +189,16 @@ function love.update(dt)
         player.score = player.score + 1
     end
 
-    if #bullet_table > 0 then
-        for key, value in pairs(bullet_table) do
-            value.pos_x = value.pos_x + value.dir_x * value.velocity * dt
-            value.pos_y = value.pos_y + value.dir_y * value.velocity * dt
+    for key, value in pairs(bullets) do
+        value.pos_x = value.pos_x + value.dir_x * value.velocity * dt
+        value.pos_y = value.pos_y + value.dir_y * value.velocity * dt
+    end
+
+    for key1, value1 in pairs(enemies) do
+        for key2, value2 in pairs(bullets) do
+            if math.sqrt((value1.pos_x - value2.pos_x) ^ 2 + (value1.pos_y - value2.pos_y) ^ 2) < value1.radius + value2.radius then
+                table.remove(enemies, key1)
+            end
         end
     end
 end
@@ -228,11 +234,9 @@ function love.draw()
         love.graphics.circle("fill", value.pos_x, value.pos_y, value.radius)
     end    
 
-    love.graphics.setColor(1, 1, 1)
-    if #bullet_table > 0 then
-        for key, value in pairs(bullet_table) do
-            love.graphics.circle("fill", value.pos_x, value.pos_y, value.radius)
-        end
+    love.graphics.setColor(1, 1, 0.5)
+    for key, value in pairs(bullets) do
+        love.graphics.circle("fill", value.pos_x, value.pos_y, value.radius)
     end
 
     -- player barrel
