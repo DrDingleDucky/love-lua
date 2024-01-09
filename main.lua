@@ -83,9 +83,9 @@ function love.mousepressed(x, y, button, istouch)
         player.dir_x = math.cos(angle) * -player.velocity 
         player.dir_y = math.sin(angle) * -player.velocity
         player.count = player.count - 1
-        local dir_x = math.sqrt(player.dir_x ^ 2 + x ^ 2) * -1
-        local dir_y = math.sqrt(player.dir_y ^ 2 + y ^ 2) * -1
-        table.insert(bullets, Bullet:new(player.pos_x, player.pos_y, 14, 800, player.dir_x / dir_x, player.dir_y / dir_y))
+        local dir_x = math.sqrt(player.pos_x ^ 2 + x ^ 2) * -1
+        local dir_y = math.sqrt(player.pos_y ^ 2 + y ^ 2) * -1
+        table.insert(bullets, Bullet:new(player.pos_x, player.pos_y, 14, 800, math.cos(angle), math.sin(angle)))
     end
 end
 
@@ -190,17 +190,22 @@ function love.update(dt)
     end
 
     for key, value in pairs(bullets) do
+        for key1, value1 in pairs(enemies) do
+            if math.sqrt((value1.pos_x - value.pos_x) ^ 2 + (value1.pos_y - value.pos_y) ^ 2) < value1.radius + value.radius then
+                table.remove(enemies, key1)
+            end
+        end
         value.pos_x = value.pos_x + value.dir_x * value.velocity * dt
         value.pos_y = value.pos_y + value.dir_y * value.velocity * dt
     end
 
-    for key1, value1 in pairs(enemies) do
-        for key2, value2 in pairs(bullets) do
-            if math.sqrt((value1.pos_x - value2.pos_x) ^ 2 + (value1.pos_y - value2.pos_y) ^ 2) < value1.radius + value2.radius then
-                table.remove(enemies, key1)
-            end
-        end
-    end
+    -- for key1, value1 in pairs(enemies) do
+    --     for key2, value2 in pairs(bullets) do
+    --         if math.sqrt((value1.pos_x - value2.pos_x) ^ 2 + (value1.pos_y - value2.pos_y) ^ 2) < value1.radius + value2.radius then
+    --             table.remove(enemies, key1)
+    --         end
+    --     end
+    -- end
 end
 
 function love.draw()
