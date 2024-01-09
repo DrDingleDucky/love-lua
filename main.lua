@@ -28,12 +28,24 @@ function Enemy:new(pos_x, pos_y, radius, velocity, dir_x, dir_y)
     return self
 end
 
-Bullet = {pos_x = 0, pos_y = 0, radius = 64}
-function Bullet:new(pos_x, pos_y, radius)
+Refill = {pos_x = 0, pos_y = 0, radius = 64}
+function Refill:new(pos_x, pos_y, radius)
+    local self = setmetatable({}, Refill)
+    self.pos_x = pos_x
+    self.pos_y = pos_y
+    self.radius = radius
+    return self
+end
+
+Bullet = {pos_x = 0, pos_y = 0, radius = 64, velocity = 250, dir_x = 0, dir_y = 0}
+function Bullet:new(pos_x, pos_y, radius, velocity, dir_x, dir_y)
     local self = setmetatable({}, Bullet)
     self.pos_x = pos_x
     self.pos_y = pos_y
     self.radius = radius
+    self.velocity = velocity
+    self.dir_x = dir_x
+    self.dir_y = dir_y
     return self
 end
 
@@ -52,9 +64,11 @@ function love.load()
     enemy2 = Enemy:new(love.graphics.getWidth() / 2 + love.graphics.getWidth() / 4, love.graphics.getHeight() / 2, 32, 250, dir[math.random(1, 2)], dir[math.random(1, 2)])
     enemies = {enemy1, enemy2}
 
-    bullet1 = Bullet:new(math.random(300, love.graphics.getWidth() - 300), math.random(300, love.graphics.getHeight() - 300), 16)
-    bullet2 = Bullet:new(math.random(300, love.graphics.getWidth() - 300), math.random(300, love.graphics.getHeight() - 300), 16)
-    bullets = {bullet1, bullet2}
+    refill1 = Refill:new(math.random(300, love.graphics.getWidth() - 300), math.random(300, love.graphics.getHeight() - 300), 16)
+    refill2 = Refill:new(math.random(300, love.graphics.getWidth() - 300), math.random(300, love.graphics.getHeight() - 300), 16)
+    refills = {refill1, refill2}
+
+    bullet_table = {}
 end
 
 function love.keypressed(key, scancode, isrepeat)
@@ -69,6 +83,9 @@ function love.mousepressed(x, y, button, istouch)
         player.dir_x = math.cos(angle) * -player.velocity 
         player.dir_y = math.sin(angle) * -player.velocity
         player.count = player.count - 1
+        local dir_x = math.sqrt(player.pos_x ^ 2 + x ^ 2) * -1
+        local dir_y = math.sqrt(player.dir_y ^ 2 + y ^ 2) * -1
+        table.insert(bullet_table, Bullet:new(player.pos_x, player.pos_y, 14, 800, player.dir_x / dir_x, player.dir_y / dir_y))
     end
 end
 
@@ -96,7 +113,7 @@ function love.update(dt)
         enemy1.pos_x = love.graphics.getWidth() / 2 - love.graphics.getWidth() / 4
         enemy2.pos_x = love.graphics.getWidth() / 2 + love.graphics.getWidth() / 4
 
-        for key, value in pairs(bullets) do
+        for key, value in pairs(refills) do
             value.pos_x = math.random(300, love.graphics.getWidth() - 300)
             value.pos_y = math.random(300, love.graphics.getHeight() - 300)    
         end
@@ -136,7 +153,7 @@ function love.update(dt)
         enemy1.pos_x = love.graphics.getWidth() / 2 - love.graphics.getWidth() / 4
         enemy2.pos_x = love.graphics.getWidth() / 2 + love.graphics.getWidth() / 4
 
-        for key, value in pairs(bullets) do
+        for key, value in pairs(refills) do
             value.pos_x = math.random(300, love.graphics.getWidth() - 300)
             value.pos_y = math.random(300, love.graphics.getHeight() - 300)    
         end
@@ -156,20 +173,27 @@ function love.update(dt)
         enemy1.pos_x = love.graphics.getWidth() / 2 - love.graphics.getWidth() / 4
         enemy2.pos_x = love.graphics.getWidth() / 2 + love.graphics.getWidth() / 4
 
-        for key, value in pairs(bullets) do
+        for key, value in pairs(refills) do
             value.pos_x = math.random(300, love.graphics.getWidth() - 300)
             value.pos_y = math.random(300, love.graphics.getHeight() - 300)    
         end
-    elseif math.sqrt((player.pos_x - bullet1.pos_x) ^ 2 + (player.pos_y - bullet1.pos_y) ^ 2) < player.radius + bullet1.radius then
-        bullet1.pos_x = math.random(300, love.graphics.getWidth() - 300)
-        bullet1.pos_y = math.random(300, love.graphics.getHeight() - 300)
+    elseif math.sqrt((player.pos_x - refill1.pos_x) ^ 2 + (player.pos_y - refill1.pos_y) ^ 2) < player.radius + refill1.radius then
+        refill1.pos_x = math.random(300, love.graphics.getWidth() - 300)
+        refill1.pos_y = math.random(300, love.graphics.getHeight() - 300)
         player.count = player.count + 1
         player.score = player.score + 1
-    elseif math.sqrt((player.pos_x - bullet2.pos_x) ^ 2 + (player.pos_y - bullet2.pos_y) ^ 2) < player.radius + bullet2.radius then
-        bullet2.pos_x = math.random(300, love.graphics.getWidth() - 300)
-        bullet2.pos_y = math.random(300, love.graphics.getHeight() - 300)
+    elseif math.sqrt((player.pos_x - refill2.pos_x) ^ 2 + (player.pos_y - refill2.pos_y) ^ 2) < player.radius + refill2.radius then
+        refill2.pos_x = math.random(300, love.graphics.getWidth() - 300)
+        refill2.pos_y = math.random(300, love.graphics.getHeight() - 300)
         player.count = player.count + 1
         player.score = player.score + 1
+    end
+
+    if #bullet_table > 0 then
+        for key, value in pairs(bullet_table) do
+            value.pos_x = value.pos_x + value.dir_x * value.velocity * dt
+            value.pos_y = value.pos_y + value.dir_y * value.velocity * dt
+        end
     end
 end
 
@@ -192,20 +216,24 @@ function love.draw()
     love.graphics.setColor(1, 1, 1)
     love.graphics.circle("fill", player.pos_x, player.pos_y, player.radius - player.radius / 2)
 
-    -- enemy1
+    -- enemies
     love.graphics.setColor(1, 0.5, 0.5)
-    love.graphics.circle("fill", enemy1.pos_x, enemy1.pos_y, enemy1.radius)
-    -- enemy2
-    love.graphics.setColor(1, 0.5, 0.5)
-    love.graphics.circle("fill", enemy2.pos_x, enemy2.pos_y, enemy2.radius)
+    for key, value in pairs(enemies) do
+        love.graphics.circle("fill", value.pos_x, value.pos_y, value.radius)
+    end
 
-    -- bullet1
+    -- refill1
     love.graphics.setColor(1, 1, 0.5)
-    love.graphics.circle("fill", bullet1.pos_x, bullet1.pos_y, bullet1.radius)
+    for key, value in pairs(refills) do
+        love.graphics.circle("fill", value.pos_x, value.pos_y, value.radius)
+    end    
 
-    -- bullet2
-    love.graphics.setColor(1, 1, 0.5)
-    love.graphics.circle("fill", bullet2.pos_x, bullet2.pos_y, bullet2.radius)
+    love.graphics.setColor(1, 1, 1)
+    if #bullet_table > 0 then
+        for key, value in pairs(bullet_table) do
+            love.graphics.circle("fill", value.pos_x, value.pos_y, value.radius)
+        end
+    end
 
     -- player barrel
     love.graphics.translate(player.pos_x, player.pos_y)
