@@ -49,26 +49,48 @@ function Bullet:new(pos_x, pos_y, radius, velocity, dir_x, dir_y)
     return self
 end
 
+function reset()
+    enemies = {
+        Enemy:new(love.graphics.getWidth() / 2 - love.graphics.getWidth() / 4, love.graphics.getHeight() / 2, 32, 200, dir[math.random(1, 2)], dir[math.random(1, 2)]),
+        Enemy:new(love.graphics.getWidth() / 2 + love.graphics.getWidth() / 4, love.graphics.getHeight() / 2, 32, 200, dir[math.random(1, 2)], dir[math.random(1, 2)])
+    }
+
+    player.pos_x = love.graphics.getWidth() / 2
+    player.pos_y = love.graphics.getHeight() / 2
+    player.dir_x = 0
+    player.dir_y = -player.velocity  / 2
+    player.count = 3
+    player.score = 0
+
+    for key, value in pairs(enemies) do
+        value.pos_y = love.graphics.getHeight() / 2
+        value.dir_x = dir[math.random(1, #dir)]
+        value.dir_y = dir[math.random(1, #dir)]
+        value.pos_x = love.graphics.getWidth() / 2 + love.graphics.getWidth() / 4 * dir[key]
+    end 
+
+    for key, value in pairs(refills) do
+        value.pos_x = math.random(300, love.graphics.getWidth() - 300)
+        value.pos_y = math.random(300, love.graphics.getHeight() - 300)    
+    end
+end
+
 function love.load()
+    math.randomseed(os.time())
+
     love.window.setTitle("Lua Game")
     love.window.setMode(1200, 860)
-
-    math.randomseed(os.time())
 
     font1 = love.graphics.newFont("fonts/Roboto-Bold.ttf", 512)
     font2 = love.graphics.newFont("fonts/Roboto-Bold.ttf", 128)
 
-    player = Player:new(love.graphics.getWidth() / 2, love.graphics.getHeight() / 2, 32, 715, 850, 0, -750 / 2, 30, 0, 0)
+    player = Player:new(love.graphics.getWidth() / 2, love.graphics.getHeight() / 2, 32, 715, 850, 0, -750 / 2, 3, 0, 0)
 
-    -- enemy1 = Enemy:new(love.graphics.getWidth() / 2 - love.graphics.getWidth() / 4, love.graphics.getHeight() / 2, 32, 50, dir[math.random(1, 2)], dir[math.random(1, 2)])
-    -- enemy2 = Enemy:new(love.graphics.getWidth() / 2 + love.graphics.getWidth() / 4, love.graphics.getHeight() / 2, 32, 50, dir[math.random(1, 2)], dir[math.random(1, 2)])
     enemies = {
-        Enemy:new(love.graphics.getWidth() / 2 - love.graphics.getWidth() / 4, love.graphics.getHeight() / 2, 32, 50, dir[math.random(1, 2)], dir[math.random(1, 2)]),
-        Enemy:new(love.graphics.getWidth() / 2 + love.graphics.getWidth() / 4, love.graphics.getHeight() / 2, 32, 50, dir[math.random(1, 2)], dir[math.random(1, 2)])
+        Enemy:new(love.graphics.getWidth() / 2 - love.graphics.getWidth() / 4, love.graphics.getHeight() / 2, 32, 200, dir[math.random(1, 2)], dir[math.random(1, 2)]),
+        Enemy:new(love.graphics.getWidth() / 2 + love.graphics.getWidth() / 4, love.graphics.getHeight() / 2, 32, 200, dir[math.random(1, 2)], dir[math.random(1, 2)])
     }
 
-    -- refill1 = Refill:new(math.random(300, love.graphics.getWidth() - 300), math.random(300, love.graphics.getHeight() - 300), 16)
-    -- refill2 = Refill:new(math.random(300, love.graphics.getWidth() - 300), math.random(300, love.graphics.getHeight() - 300), 16)
     refills = {
         Refill:new(math.random(300, love.graphics.getWidth() - 300), math.random(300, love.graphics.getHeight() - 300), 16),
         Refill:new(math.random(300, love.graphics.getWidth() - 300), math.random(300, love.graphics.getHeight() - 300), 16)
@@ -102,24 +124,7 @@ function love.update(dt)
     elseif player.pos_x > love.graphics.getWidth() - player.radius then
         player.dir_x = -math.abs(player.dir_x)
     elseif player.pos_y > love.graphics.getHeight() + player.radius then
-        player.pos_x = love.graphics.getWidth() / 2
-        player.pos_y = love.graphics.getHeight() / 2
-        player.dir_x = 0
-        player.dir_y = -player.velocity  / 2
-        player.count = 3
-        player.score = 0
-
-        for key, value in pairs(enemies) do
-            value.pos_y = love.graphics.getHeight() / 2
-            value.dir_x = dir[math.random(1, #dir)]
-            value.dir_y = dir[math.random(1, #dir)]
-            value.pos_x = love.graphics.getWidth() / 2 + love.graphics.getWidth() / 4 * dir[key]
-        end 
-
-        for key, value in pairs(refills) do
-            value.pos_x = math.random(300, love.graphics.getWidth() - 300)
-            value.pos_y = math.random(300, love.graphics.getHeight() - 300)    
-        end
+        reset()
     end
 
     player.pos_x = player.pos_x + player.dir_x * dt
@@ -138,24 +143,7 @@ function love.update(dt)
         end
 
         if math.sqrt((player.pos_x - value.pos_x) ^ 2 + (player.pos_y - value.pos_y) ^ 2) < player.radius + value.radius then
-            player.pos_x = love.graphics.getWidth() / 2
-            player.pos_y = love.graphics.getHeight() / 2
-            player.dir_x = 0
-            player.dir_y = -player.velocity  / 2
-            player.count = 3
-            player.score = 0
-
-            for key, value in pairs(enemies) do
-                value.pos_y = love.graphics.getHeight() / 2
-                value.dir_x = dir[math.random(1, #dir)]
-                value.dir_y = dir[math.random(1, #dir)]
-            end
-            value.pos_x = love.graphics.getWidth() / 2 + love.graphics.getWidth() / 4 * dir[key]
-
-            for key, value in pairs(refills) do
-                value.pos_x = math.random(300, love.graphics.getWidth() - 300)
-                value.pos_y = math.random(300, love.graphics.getHeight() - 300)    
-            end
+            reset()
         end
         value.pos_x = value.pos_x + value.dir_x * value.velocity  * dt
         value.pos_y = value.pos_y + value.dir_y * value.velocity  * dt
