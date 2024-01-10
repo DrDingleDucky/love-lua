@@ -52,14 +52,16 @@ function Bullet:new(pos_x, pos_y, radius, velocity, dir_x, dir_y)
     return self
 end
 
-function reset_scene()
+function score_check()
     if player.current_score > player.high_score then
         player.high_score = player.current_score
         file = io.open("score.txt", "w")
         file:write(tostring(player.current_score))
         file:close()
     end
+end
 
+function reset_scene()
     player.pos_x = love.graphics.getWidth() / 2
     player.pos_y = love.graphics.getHeight() / 2 + love.graphics.getHeight() / 3
     player.dir_x = 0
@@ -97,6 +99,7 @@ function love.load()
 
     font1 = love.graphics.newFont("fonts/Roboto-Bold.ttf", 512)
     font2 = love.graphics.newFont("fonts/Roboto-Bold.ttf", 128)
+    font3 = love.graphics.newFont("fonts/Roboto-Bold.ttf", 48)
 
     file = io.open("score.txt", "r")
     local high_score = file:read("n")
@@ -115,15 +118,6 @@ function love.load()
     }
 
     bullets = {}
-end
-
-function love.quit()
-    if player.current_score > player.high_score then
-        player.high_score = player.current_score
-        file = io.open("score.txt", "w")
-        file:write(tostring(player.current_score))
-        file:close()
-    end
 end
 
 function love.keypressed(key, scancode, isrepeat)
@@ -157,6 +151,7 @@ function love.update(dt)
     elseif player.pos_x > love.graphics.getWidth() - player.radius then
         player.dir_x = -math.abs(player.dir_x)
     elseif player.pos_y > love.graphics.getHeight() + player.radius then
+        score_check()
         reset_scene()
     end
 
@@ -176,6 +171,7 @@ function love.update(dt)
         end
 
         if math.sqrt((player.pos_x - value.pos_x) ^ 2 + (player.pos_y - value.pos_y) ^ 2) < player.radius + value.radius then
+            score_check()
             reset_scene()
         end
         value.pos_x = value.pos_x + value.dir_x * value.velocity  * dt
@@ -213,6 +209,13 @@ function love.draw()
     love.graphics.setFont(font2)
     if paused or menu then
         love.graphics.print(player.high_score, love.graphics.getWidth() / 2 - font2:getWidth(player.high_score) / 2, 0)
+        if menu then
+            love.graphics.setFont(font3)
+            love.graphics.print("Press Space To Start", love.graphics.getWidth() / 2 - font3:getWidth("Press Space To Start") / 2, love.graphics.getHeight() / 6)
+        elseif paused then
+            love.graphics.setFont(font3)
+            love.graphics.print("Paused", love.graphics.getWidth() / 2 - font3:getWidth("Paused") / 2, love.graphics.getHeight() / 6)
+        end
     else
         love.graphics.print(player.current_score, love.graphics.getWidth() / 2 - font2:getWidth(player.current_score) / 2, 0)
     end
@@ -252,4 +255,8 @@ function love.draw()
     -- player barrel end
     love.graphics.setColor(1, 1, 1)
     love.graphics.circle("fill", player.pos_x + 48, player.pos_y, 7)
+end
+
+function love.quit()
+    score_check()
 end
