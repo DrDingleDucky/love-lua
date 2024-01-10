@@ -1,8 +1,9 @@
 local dir = {-1, 1}
+local menu = true
 local paused = false
 
-Player = {pos_x = 0, pos_y = 0, radius = 64, velocity = 500, gravity = 600, dir_x = 0, dir_y = 0, count = 0, score = 0, angle = 0}
-function Player:new(pos_x, pos_y, radius, velocity, gravity, dir_x, dir_y, count, score, angle)
+Player = {pos_x = 0, pos_y = 0, radius = 64, velocity = 500, gravity = 600, dir_x = 0, dir_y = 0, count = 0, current_score = 0, high_score = 0, angle = 0}
+function Player:new(pos_x, pos_y, radius, velocity, gravity, dir_x, dir_y, count, current_score, high_score, angle)
     local self = setmetatable({}, Player)
     self.pos_x = pos_x
     self.pos_y = pos_y
@@ -12,7 +13,8 @@ function Player:new(pos_x, pos_y, radius, velocity, gravity, dir_x, dir_y, count
     self.dir_x = dir_x
     self.dir_y = dir_y
     self.count = count
-    self.score = score
+    self.current_score = current_score
+    self.high_score = high_score
     self.angle = angle
     return self
 end
@@ -50,18 +52,27 @@ function Bullet:new(pos_x, pos_y, radius, velocity, dir_x, dir_y)
     return self
 end
 
-function reset()
+function reset_scene()
+    if player.current_score > player.high_score then
+        player.high_score = player.current_score
+        file = io.open("score.txt", "w")
+        file:write(tostring(player.current_score))
+        file:close()
+    end
+
+    player.pos_x = love.graphics.getWidth() / 2
+    player.pos_y = love.graphics.getHeight() / 2 + love.graphics.getHeight() / 3
+    player.dir_x = 0
+    player.dir_y = -player.velocity
+    player.count = 3
+    player.current_score = 0
+
     enemies = {
         Enemy:new(love.graphics.getWidth() / 2 - love.graphics.getWidth() / 4, love.graphics.getHeight() / 2, 32, 200, dir[math.random(1, 2)], dir[math.random(1, 2)]),
         Enemy:new(love.graphics.getWidth() / 2 + love.graphics.getWidth() / 4, love.graphics.getHeight() / 2, 32, 200, dir[math.random(1, 2)], dir[math.random(1, 2)])
     }
 
-    player.pos_x = love.graphics.getWidth() / 2
-    player.pos_y = love.graphics.getHeight() / 2
-    player.dir_x = 0
-    player.dir_y = -player.velocity  / 2
-    player.count = 3
-    player.score = 0
+    bullets = {}
 
     for key, value in pairs(enemies) do
         value.pos_y = love.graphics.getHeight() / 2
@@ -74,6 +85,8 @@ function reset()
         value.pos_x = math.random(300, love.graphics.getWidth() - 300)
         value.pos_y = math.random(300, love.graphics.getHeight() - 300)    
     end
+
+    menu = true
 end
 
 function love.load()
@@ -85,7 +98,11 @@ function love.load()
     font1 = love.graphics.newFont("fonts/Roboto-Bold.ttf", 512)
     font2 = love.graphics.newFont("fonts/Roboto-Bold.ttf", 128)
 
-    player = Player:new(love.graphics.getWidth() / 2, love.graphics.getHeight() / 2, 32, 715, 850, 0, -750 / 2, 3, 0, 0)
+    file = io.open("score.txt", "r")
+    local high_score = file:read("n")
+    file:close()
+
+    player = Player:new(love.graphics.getWidth() / 2, love.graphics.getHeight() / 2 + love.graphics.getHeight() / 3, 32, 715, 850, 0, -750, 3, 0, high_score, 0)
 
     enemies = {
         Enemy:new(love.graphics.getWidth() / 2 - love.graphics.getWidth() / 4, love.graphics.getHeight() / 2, 32, 200, dir[math.random(1, 2)], dir[math.random(1, 2)]),
@@ -100,15 +117,25 @@ function love.load()
     bullets = {}
 end
 
+function love.quit()
+    if player.current_score > player.high_score then
+        player.high_score = player.current_score
+        file = io.open("score.txt", "w")
+        file:write(tostring(player.current_score))
+        file:close()
+    end
+end
+
 function love.keypressed(key, scancode, isrepeat)
-    if key == "escape" then
-        -- love.event.quit()
+    if key == "escape" and not menu then
         paused = not paused
+    elseif key == "space" then
+        menu = false
     end
 end
 
 function love.mousepressed(x, y, button, istouch)
-    if paused then return end
+    if paused or menu then return end
 
     if button == 1 and player.count > 0 then
         local angle = math.atan2(y - player.pos_y, x - player.pos_x)
@@ -120,7 +147,7 @@ function love.mousepressed(x, y, button, istouch)
 end
 
 function love.update(dt)
-    if paused then dt = 0 end
+    if paused or menu then dt = 0 end
 
     local x, y = love.mouse.getPosition()
     player.angle = math.atan2(y - player.pos_y, x - player.pos_x)
@@ -130,7 +157,7 @@ function love.update(dt)
     elseif player.pos_x > love.graphics.getWidth() - player.radius then
         player.dir_x = -math.abs(player.dir_x)
     elseif player.pos_y > love.graphics.getHeight() + player.radius then
-        reset()
+        reset_scene()
     end
 
     player.pos_x = player.pos_x + player.dir_x * dt
@@ -149,7 +176,7 @@ function love.update(dt)
         end
 
         if math.sqrt((player.pos_x - value.pos_x) ^ 2 + (player.pos_y - value.pos_y) ^ 2) < player.radius + value.radius then
-            reset()
+            reset_scene()
         end
         value.pos_x = value.pos_x + value.dir_x * value.velocity  * dt
         value.pos_y = value.pos_y + value.dir_y * value.velocity  * dt
@@ -160,7 +187,7 @@ function love.update(dt)
             value.pos_x = math.random(300, love.graphics.getWidth() - 300)
             value.pos_y = math.random(300, love.graphics.getHeight() - 300)
             player.count = player.count + 1
-            player.score = player.score + 1
+            player.current_score = player.current_score + 1
         end
     end
 
@@ -184,7 +211,11 @@ function love.draw()
     love.graphics.setFont(font1)
     love.graphics.print(player.count, love.graphics.getWidth() / 2 - font1:getWidth(player.count) / 2, love.graphics.getHeight() / 2 - font1:getHeight() / 2)
     love.graphics.setFont(font2)
-    love.graphics.print(player.score, love.graphics.getWidth() / 2 - font2:getWidth(player.score) / 2, 0)
+    if paused or menu then
+        love.graphics.print(player.high_score, love.graphics.getWidth() / 2 - font2:getWidth(player.high_score) / 2, 0)
+    else
+        love.graphics.print(player.current_score, love.graphics.getWidth() / 2 - font2:getWidth(player.current_score) / 2, 0)
+    end
 
     -- player
     love.graphics.setColor(0.5, 1, 0.5)
