@@ -97,9 +97,9 @@ function love.load()
     love.window.setTitle("Lua Game")
     love.window.setMode(1200, 860)
 
-    font1 = love.graphics.newFont("fonts/roboto-bold.ttf", 512)
-    font2 = love.graphics.newFont("fonts/roboto-bold.ttf", 128)
-    font3 = love.graphics.newFont("fonts/roboto-bold.ttf", 48)
+    font1 = love.graphics.newFont("font/roboto-bold.ttf", 512)
+    font2 = love.graphics.newFont("font/roboto-bold.ttf", 128)
+    font3 = love.graphics.newFont("font/roboto-bold.ttf", 48)
 
     file = io.open("score.txt", "r")
     local high_score = file:read("n")
